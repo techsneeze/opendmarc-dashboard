@@ -46,11 +46,12 @@ function format_date($date, $format) {
 	return $answer;
 };
 
-function tmpl_reportList($allowed_reports, $arrayreport, $arrayIPs, $arraydomains, $dispositions, $dmarcpolicy, $aligned) {
+function tmpl_reportList($allowed_reports, $arrayreport, $arrayIPs, $arraydomains, $dispositions, $dmarcpolicy, $aligned, $limit, $totalrows) {
 	$reportlist[] = "";
 	$reportlist[] = "<!-- Start of report list -->";
 
 	$reportlist[] = "<h1>OpenDMARC Dashboard</h1>";
+	$reportlist[] = "<h3>Displaying ". $limit ." of ". $totalrows . " Entries </h2>";
 	$reportlist[] = "<table class='reportlist'>";
 	$reportlist[] = "  <thead>";
 	$reportlist[] = "    <tr>";
@@ -169,11 +170,14 @@ $allowed_reports = array();
 $limit = 90;
 
 // Check if a limit has been passed via URL, and change to that if present
-if (isset($_GET["limit"])){
+if (isset($_GET["limit"]) && is_numeric($_GET["limit"])){
 	$limit = $_GET["limit"];
 };
 $sql = "SELECT * from messages ORDER BY date DESC LIMIT $limit;";
+$sqlall = "SELECT * from messages ORDER BY date DESC;";
 $query = $mysqli->query($sql) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$queryall = $mysqli->query($sqlall) or die("Query failed: ".$mysqli->error." (Error #" .$mysqli->errno.")");
+$totalrows = mysqli_num_rows($queryall);
 while($row = $query->fetch_assoc()) {
 	//todo: check ACL if this row is allowed
 	if (true) {
@@ -217,7 +221,7 @@ $blah='5';
 
 // Generate Page with report list and report data (if a report is selected).
 echo tmpl_page( ""
-	.tmpl_reportList($allowed_reports, $arrayreport, $arrayIPs, $arraydomains, $dispositions, $dmarcpolicy, $aligned)
+	.tmpl_reportList($allowed_reports, $arrayreport, $arrayIPs, $arraydomains, $dispositions, $dmarcpolicy, $aligned, $limit, $totalrows)
 );
 
 ?>

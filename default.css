@@ -2,6 +2,10 @@ h1 {
 	text-align: center;
 }
 
+h3 {
+	text-align: center;
+}
+
 table.reportlist {
 	margin: 2em auto 2em auto;
 	border-collapse: collapse;
